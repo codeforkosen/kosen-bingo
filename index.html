@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>こみかるメンバーBINGO</title>
+</head><body>
+<h1>こみかるメンバーBINGO</h1>
+
+<main>
+<div id=divbingo></div>
+<h2>こみかるメンバーに会ったらオープン！</h2>
+<div id=divmember></div>
+</main>
+
+<hr>
+<button id=btnreset>BINGOカードをリセットする</button>
+<hr>
+DATA: <a href=https://code4fukui.github.io/comical/member.csv>こみかるメンバーオープンデータ(CSV)</a> - <a href=https://www.instagram.com/comicalyouth/>こみかる ユース福井(@comicalyouth)</a><br>
+<a href=httsp://github.com/code4fukui/comical/>src on GitHub</a><br>
+
+<script type="module">
+import { CSV } from "https://code4fukui.github.io/CSV/CSV.js";
+import { rnd } from "https://js.sabae.cc/rnd.js";
+import { shuffle } from "https://js.sabae.cc/shuffle.js";
+
+const base = "https://code4fukui.github.io/comical/";
+
+const members = await CSV.fetchJSON("./member.csv");
+console.log(members);
+
+const cr = (tag, parent) => {
+  const c = document.createElement(tag);
+  if (parent) parent.appendChild(c);
+  return c;
+};
+const btns = [];
+for (let i = 0; i < members.length; i++) {
+  const m = members[i];
+  const div = cr("div", divmember);
+  const a = cr("a", div);
+  a.setAttribute("target", "_blank");
+  a.setAttribute("href", m.url);
+  const img = new Image();
+  img.src = m.img;
+  div.appendChild(img);
+  const btn = cr("button", div);
+  btn.textContent = m.name + "に会った！";
+  btn.targetName = m.name;
+  btns.push(btn);
+}
+
+const supporters = [
+  "img/lpa.jpg",
+  "img/smileactive.jpg",
+];
+
+const makeBingoCard = () => {
+  const wbingo = 5;
+  const bingo = [];
+  if (members.length <= wbingo * wbingo - 1) {
+    for (const m of members) {
+      bingo.push({ open: false, name: m.name, img: m.img });
+    }
+    const members2 = members.map(i => i);
+    shuffle(members2);
+    for (let i = 0; i < wbingo * wbingo - 1 - members.length; i++) {
+      const m = members2[i];
+      bingo.push({ open: false, name: m.name, img: m.img });
+    }
+    console.log(bingo.length);
+  } else {
+    const members2 = members.map(i => i);
+    shuffle(members2);
+    for (let i = 0; i < wbingo * wbingo - 1; i++) {
+      const m = members2[i];
+      bingo.push({ open: false, name: m.name, img: m.img });
+    }
+  }
+  shuffle(bingo);
+  bingo.splice(12, 0, { open: true, name: "こみかる", img: base + "img/comical.jpg" });
+  console.log(bingo);
+  return bingo;
+};
+const showBingoCard = (bingo) => {
+  divbingo.innerHTML = "";
+  for (let i = 0; i < 5; i++) {
+    const div = cr("div", divbingo);
+    div.textContent = "BINGO"[i];
+    div.className = "bingo";
+  }
+  for (let i = 0; i < bingo.length; i++) {
+    const b = bingo[i];
+    const div = cr("div", divbingo);
+    const img = new Image();
+    img.src = b.open ? b.img : base + supporters[i % supporters.length];
+    img.style.filter = b.open ? "" : "grayscale(1)";
+    div.appendChild(img);
+    div.onclick = () => {
+      if (b.open) {
+        alert(b.name);
+      }
+    };
+  }
+};
+const loadBingoCard = () => {
+  const s = localStorage.getItem("comical_bingo");
+  if (!s) return null;
+  return JSON.parse(s);
+};
+const saveBingoCard = (bingo) => {
+  localStorage.setItem("comical_bingo", JSON.stringify(bingo));
+};
+const resetBingoCard = () => {
+  localStorage.removeItem("comical_bingo");
+};
+
+const bingo = loadBingoCard() || makeBingoCard();
+showBingoCard(bingo);
+saveBingoCard(bingo);
+
+btns.forEach(btn => {
+  btn.onclick = () => {
+    const b = bingo.find(b => b.name == btn.targetName);
+    if (b.open) {
+      alert(b.name + "に再会！");
+    } else {
+      b.open = true;
+      saveBingoCard(bingo);
+      alert(b.name + "に会った!");
+      showBingoCard(bingo);
+    }
+    scrollTo({
+      top: divbingo.offsetTop,
+      behavior: "smooth"
+    });
+  }
+});
+
+btnreset.onclick = () => {
+  if (confirm("BINGOカード、リセットしちゃう？")) {
+    resetBingoCard();
+    location.reload();
+  }
+};
+</script>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  color: #005aac;
+}
+#divmember > div {
+  display: inline-block;
+  margin: .4vw;
+}
+#divmember img {
+  width: 30vw;
+  display: block;
+}
+#divmember button {
+  display: inline-block;
+  margin: .3em 0 .8em 0;
+}
+#divbingo {
+  width: 80vw;
+  display: inline-block;
+}
+#divbingo .bingo {
+  width: 15vw;
+  font-size: 4vw;
+}
+#divbingo > div {
+  display: inline-block;
+  margin: .4vw;
+}
+#divbingo img {
+  width: 15vw;
+}
+#btnreset {
+  font-size: 80%;
+}
+a {
+  color: gray !important;
+}
+</style>
+</body></html>
