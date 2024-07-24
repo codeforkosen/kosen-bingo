@@ -37,11 +37,11 @@ for (let i = 0; i < members.length; i++) {
   const m = members[i];
   const div = cr("div", divmember);
   const a = cr("a", div);
-  a.setAttribute("target", "_blank");
   a.setAttribute("href", m.url);
+  a.setAttribute("target", "_blank");
   const img = new Image();
   img.src = m.img;
-  div.appendChild(img);
+  a.appendChild(img);
   const btn = cr("button", div);
   if (isMobile(window.navigator).any) {
     btn.innerHTML = m.name + "に<br>会った！";
