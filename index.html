@@ -24,7 +24,8 @@ import isMobile from "https://code4fukui.github.io/isMobile/isMobile.js";
 const base = "https://code4fukui.github.io/comical/";
 
 const members = await CSV.fetchJSON("./member.csv");
-console.log(members);
+//console.log(members);
+//members.length = 5; // for test
 
 const cr = (tag, parent) => {
   const c = document.createElement(tag);
@@ -66,7 +67,7 @@ const makeBingoCard = () => {
     const members2 = members.map(i => i);
     shuffle(members2);
     for (let i = 0; i < wbingo * wbingo - 1 - members.length; i++) {
-      const m = members2[i];
+      const m = members2[i % members2.length];
       bingo.push({ open: false, name: m.name, img: m.img });
     }
     console.log(bingo.length);
@@ -116,7 +117,8 @@ const resetBingoCard = () => {
   localStorage.removeItem("comical_bingo");
 };
 
-const bingo = loadBingoCard() || makeBingoCard();
+//const bingo = loadBingoCard() || makeBingoCard();
+const bingo = makeBingoCard();
 showBingoCard(bingo);
 saveBingoCard(bingo);
 
@@ -126,7 +128,7 @@ btns.forEach(btn => {
     if (b.open) {
       alert(b.name + "に再会！");
     } else {
-      b.open = true;
+      bingo.filter(b => b.name == btn.targetName).forEach(b => b.open = true);
       saveBingoCard(bingo);
       alert(b.name + "に会った!");
       showBingoCard(bingo);
