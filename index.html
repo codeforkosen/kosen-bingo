@@ -117,8 +117,8 @@ const resetBingoCard = () => {
   localStorage.removeItem("comical_bingo");
 };
 
-//const bingo = loadBingoCard() || makeBingoCard();
-const bingo = makeBingoCard();
+const bingo = loadBingoCard() || makeBingoCard();
+//const bingo = makeBingoCard();
 showBingoCard(bingo);
 saveBingoCard(bingo);
 
