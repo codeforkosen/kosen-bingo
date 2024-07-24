@@ -19,6 +19,7 @@ DATA: <a href=https://code4fukui.github.io/comical/member.csv>こみかるメン
 import { CSV } from "https://code4fukui.github.io/CSV/CSV.js";
 import { rnd } from "https://js.sabae.cc/rnd.js";
 import { shuffle } from "https://js.sabae.cc/shuffle.js";
+import isMobile from "https://code4fukui.github.io/isMobile/isMobile.js";
 
 const base = "https://code4fukui.github.io/comical/";
 
@@ -41,7 +42,11 @@ for (let i = 0; i < members.length; i++) {
   img.src = m.img;
   div.appendChild(img);
   const btn = cr("button", div);
-  btn.textContent = m.name + "に会った！";
+  if (isMobile(window.navigator).any) {
+    btn.innerHTML = m.name + "に<br>会った！";
+  } else {
+    btn.textContent = m.name + "に会った！";
+  }
   btn.targetName = m.name;
   btns.push(btn);
 }
