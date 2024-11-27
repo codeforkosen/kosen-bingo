@@ -1,19 +1,20 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
-<title>こみかるメンバーBINGO</title>
+<title>高専キャンパスBINGO</title>
 </head><body>
-<h1>こみかるメンバーBINGO</h1>
+<h1>高専キャンパスBINGO</h1>
 
 <main>
 <div id=divbingo></div>
-<h2>メンバーに会ったらオープン！</h2>
+<h2>キャンパスに行ったらオープン！</h2>
 <div id=divmember></div>
 </main>
 
 <hr>
 <button id=btnreset>BINGOカードをリセットする</button>
 <hr>
-DATA: <a href=https://code4fukui.github.io/comical/member.csv>こみかるメンバーオープンデータ(CSV)</a> - <a href=https://www.instagram.com/comicalyouth/>こみかる ユース福井(@comicalyouth)</a><br>
-<a href=https://github.com/code4fukui/comical/>src on GitHub</a><br>
+DATA: <a href=https://codeforkosen.github.io/kosen-opendata/data/kosen_campus.csv>高専キャンパスオープンデータ(CSV)</a>, <a href=https://codeforkosen.github.io/kosen-opendata/data/kosen.csv>高専一覧</a> （<a href=https://github.com/codeforkosen/kosen-opendata>高専オープンデータ</a>）<br>
+IMAGE: <a href=https://kosenjin.org/>高専人会</a><br>
+<a href=https://github.com/codeforkosen/kosen-bingo/>src on GitHub</a><br>
 
 <script type="module">
 import { CSV } from "https://code4fukui.github.io/CSV/CSV.js";
@@ -21,11 +22,28 @@ import { rnd } from "https://js.sabae.cc/rnd.js";
 import { shuffle } from "https://js.sabae.cc/shuffle.js";
 import isMobile from "https://code4fukui.github.io/isMobile/isMobile.js";
 
-const base = "https://code4fukui.github.io/comical/";
-
-const members = await CSV.fetchJSON("./member.csv");
-//console.log(members);
+const url = "https://codeforkosen.github.io/kosen-opendata/data/kosen_campus.csv";
+const members = await CSV.fetchJSON(url);
+console.log(members);
 //members.length = 5; // for test
+
+const url2 = "https://codeforkosen.github.io/kosen-opendata/data/kosen.csv";
+const kosens = await CSV.fetchJSON(url2);
+console.log(kosens);
+for (const m of members) {
+  const kosen0 = kosens.find(i => {
+    return i.name_ja.indexOf(m.shortname2) >= 0;
+  });
+  const kosen = kosen0 ?? kosens.find(i => {
+    const name = m.shortname.substring(0, m.shortname.indexOf("（"));
+    return i.name_ja.indexOf(name) >= 0;
+  });
+  if (!kosen) {
+    console.log("not found", m);
+  } else {
+    m.img = kosen.img_emblem;
+  }
+}
 
 const cr = (tag, parent) => {
   const c = document.createElement(tag);
@@ -37,24 +55,23 @@ for (let i = 0; i < members.length; i++) {
   const m = members[i];
   const div = cr("div", divmember);
   const a = cr("a", div);
-  a.setAttribute("href", m.url);
+  a.setAttribute("href", m.URL);
   a.setAttribute("target", "_blank");
   const img = new Image();
   img.src = m.img;
   a.appendChild(img);
   const btn = cr("button", div);
   if (isMobile(window.navigator).any) {
-    btn.innerHTML = m.name + "に<br>会った！";
+    btn.innerHTML = m.name + "に<br>行った！";
   } else {
-    btn.textContent = m.name + "に会った！";
+    btn.textContent = m.name + "に行った！";
   }
   btn.targetName = m.name;
   btns.push(btn);
 }
 
 const supporters = [
-  "img/lpa.jpg",
-  "img/smileactive.jpg",
+  "./img/kosenjinkai.png",
 ];
 
 const makeBingoCard = () => {
@@ -80,7 +97,7 @@ const makeBingoCard = () => {
     }
   }
   shuffle(bingo);
-  bingo.splice(12, 0, { open: true, name: "こみかる", img: base + "img/comical.jpg" });
+  bingo.splice(12, 0, { open: true, name: "Code for KOSEN", img: "./img/codeforkosen.png" });
   console.log(bingo);
   return bingo;
 };
@@ -95,7 +112,7 @@ const showBingoCard = (bingo) => {
     const b = bingo[i];
     const div = cr("div", divbingo);
     const img = new Image();
-    img.src = b.open ? b.img : base + supporters[i % supporters.length];
+    img.src = b.open ? b.img : supporters[i % supporters.length];
     img.style.filter = b.open ? "" : "grayscale(1)";
     div.appendChild(img);
     div.onclick = () => {
@@ -125,13 +142,18 @@ saveBingoCard(bingo);
 btns.forEach(btn => {
   btn.onclick = () => {
     const b = bingo.find(b => b.name == btn.targetName);
-    if (b.open) {
-      alert(b.name + "に再会！");
+    if (!b) {
+      alert("残念！" + btn.targetName + "は、カードにはなかった・・・");
     } else {
-      bingo.filter(b => b.name == btn.targetName).forEach(b => b.open = true);
-      saveBingoCard(bingo);
-      alert(b.name + "に会った!");
-      showBingoCard(bingo);
+      if (b.open) {
+        alert(b.name + "に再度行った！");
+      } else {
+        alert(b.name + "に行った!");
+        const kosens = bingo.filter(b => b.name == btn.targetName);
+        kosens.forEach(b => b.open = true);
+        saveBingoCard(bingo);
+        showBingoCard(bingo);
+      }
     }
     scrollTo({
       top: divbingo.offsetTop,
@@ -152,7 +174,7 @@ btnreset.onclick = () => {
 body {
   font-family: sans-serif;
   text-align: center;
-  color: #005aac;
+  color: #0e1d2b;
 }
 #divmember > div {
   display: inline-block;
