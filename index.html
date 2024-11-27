@@ -22,6 +22,8 @@ import { rnd } from "https://js.sabae.cc/rnd.js";
 import { shuffle } from "https://js.sabae.cc/shuffle.js";
 import isMobile from "https://code4fukui.github.io/isMobile/isMobile.js";
 
+const storageName = "kosen-bingo";
+
 const url = "https://codeforkosen.github.io/kosen-opendata/data/kosen_campus.csv";
 const members = await CSV.fetchJSON(url);
 console.log(members);
@@ -123,15 +125,15 @@ const showBingoCard = (bingo) => {
   }
 };
 const loadBingoCard = () => {
-  const s = localStorage.getItem("comical_bingo");
+  const s = localStorage.getItem(storageName);
   if (!s) return null;
   return JSON.parse(s);
 };
 const saveBingoCard = (bingo) => {
-  localStorage.setItem("comical_bingo", JSON.stringify(bingo));
+  localStorage.setItem(storageName, JSON.stringify(bingo));
 };
 const resetBingoCard = () => {
-  localStorage.removeItem("comical_bingo");
+  localStorage.removeItem(storageName);
 };
 
 const bingo = loadBingoCard() || makeBingoCard();
