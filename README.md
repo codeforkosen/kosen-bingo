@@ -1,9 +1,11 @@
-# comical
+# kosen-bingo
  
-- [こみかるメンバーBINGO](https://code4fukui.github.io/comical/)
-- [こみかるメンバーオープンデータ(CSV)](https://code4fukui.github.io/comical/member.csv)
+- [高専キャンパスBINGO](https://codeforkosen.github.io/kosen-bing/)
 
-## src
+## reference
 
-- [こみかる ユース福井(@comicalyouth) • Instagram写真と動画](https://www.instagram.com/comicalyouth/)
+- [高専オープンデータ](https://github.com/codeforkosen/kosen-opendata)
 
+## forked from
+
+- [こみかるメンバーBINGO](https://github.com/code4fukui/comical)
